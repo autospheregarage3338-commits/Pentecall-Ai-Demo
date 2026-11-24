@@ -408,5 +408,24 @@ if(e.target.closest('button'))navigator.vibrate?.(15);
 });
 renderContacts();renderGroups();renderStatuses();
 </script>
+  <script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  const firebaseConfig = {
+    apiKey: "AIzaSyAXB1O4xp9dY8vrhJ6iIPQTpiSTdZwPwBc",
+    authDomain: "pentecall-ai-eb396.firebaseapp.com",
+    projectId: "pentecall-ai-eb396",
+    storageBucket: "pentecall-ai-eb396.firebasestorage.app",
+    messagingSenderId: "20907676298",
+    appId: "1:20907676298:web:2e613071e415bd49d49373"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+</script>
 </body>
 </html>
