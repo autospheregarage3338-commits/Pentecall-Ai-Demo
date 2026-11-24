@@ -1,35 +1,340 @@
-<!doctype html>
-<html dir="ltr" lang="en"  webui-rounded-icons>
-  <head>
-    <meta charset="utf-8">
-    <title>New tab</title>
-    <style>
-      body {
-        background: #FCFAE8;
-        margin: 0;
-      }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PENTECALL AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#120820;color:white;font-family:Arial,sans-serif}
+header{background:linear-gradient(120deg,#391466,#7b3fe4);padding:22px;text-align:center;box-shadow:0 5px 25px #0008}
+h1{margin:0;color:#fff;letter-spacing:2px;text-shadow:0 0 12px #d2b5ff}
+small,p{color:#c9badd}
+main{padding:16px;max-width:650px;margin:auto;padding-bottom:105px}
+.card{background:linear-gradient(145deg,#382057,#201030);border:1px solid #ffffff30;border-radius:20px;padding:18px;margin:14px 0;box-shadow:5px 8px 18px #0008}
+button{border:0;background:linear-gradient(145deg,#ac80ff,#6931d5);color:white;border-radius:13px;padding:13px;margin:5px 3px;font-weight:bold;box-shadow:0 4px 0 #38127d;cursor:pointer}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 #38127d}
+input,select,textarea{width:100%;padding:13px;margin:8px 0;background:#140a24;border:1px solid #8c66b7;border-radius:12px;color:white}
+nav{position:fixed;bottom:0;left:0;right:0;background:#241139;display:flex;justify-content:space-around;padding:10px 2px;z-index:5}
+nav button{background:none;box-shadow:none;font-size:11px;padding:7px 2px}
+.hide{display:none!important}
+.item{padding:14px;border-bottom:1px solid #ffffff20;cursor:pointer}
+.bubble{padding:12px;background:#6739a4;border-radius:15px;margin:8px 0;overflow-wrap:anywhere}
+.notice{color:#d6c8ef;font-size:12px}
+#callOverlay{position:fixed;inset:0;background:radial-gradient(circle,#562591,#110720);z-index:10;text-align:center;padding:12vh 20px}
+video{width:90%;max-width:350px;border-radius:20px;background:black}
+</style>
+</head>
+<body>
 
-      #backgroundImage {
-        border: none;
-        height: 100%;
-        pointer-events: none;
-        position: fixed;
-        top: 0;
-        visibility: hidden;
-        width: 100%;
-      }
+<div id="login">
+<header><h1>PENTECALL AI</h1><p>Connect Beyond Language</p></header>
+<main>
+<div class="card">
+<h2>Welcome</h2>
+<input id="phone" type="tel" placeholder="Enter phone number">
+<button onclick="authNotice()">Send OTP</button>
+<input placeholder="Enter OTP">
+<button onclick="authNotice()">Verify OTP</button>
+<p>Or continue with</p>
+<button onclick="authNotice()">Google Sign In</button>
+<button onclick="authNotice()">Create Account</button>
+<p class="notice">Real authentication requires Firebase or another secure provider.</p>
+<button onclick="enterApp()">Open UI Testing Preview</button>
+</div>
+</main>
+</div>
 
-      [show-background-image] #backgroundImage {
-        visibility: visible;
-      }
-    </style>
-  </head>
-  <body>
-    <iframe id="backgroundImage" src=""></iframe>
-    <ntp-app></ntp-app>
-    <script type="module" src="new_tab_page.js"></script>
-    <link rel="stylesheet" href="chrome://resources/css/text_defaults_md.css">
-    <link rel="stylesheet" href="chrome://theme/colors.css?sets=ui,chrome">
-    <link rel="stylesheet" href="shared_vars.css">
-  </body>
+<div id="app" class="hide">
+<header><h1>PENTECALL AI</h1><small>Premium Communication Platform</small></header>
+<main>
+
+<section id="chats">
+<h2>Chats</h2>
+<button onclick="newChat()">+ New Chat</button>
+<div id="chatList"></div>
+<div id="conversation" class="card hide">
+<h3 id="chatTitle"></h3>
+<div id="messages"></div>
+<input id="message" placeholder="Type a message">
+<button onclick="sendMessage()">Send</button>
+<button onclick="call('audio')">Voice Call</button>
+<button onclick="call('video')">Video Call</button>
+</div>
+</section>
+
+<section id="updates" class="hide">
+<h2>Updates</h2>
+<div class="card">
+<h3>My Status</h3>
+<input id="statusText" placeholder="Write a status">
+<button onclick="postStatus()">Post Update</button>
+<div id="statuses"></div>
+</div>
+</section>
+
+<section id="communities" class="hide">
+<h2>Communities</h2>
+<div class="card">
+<input id="groupName" placeholder="Community name">
+<button onclick="createGroup()">Create Community</button>
+<div id="groups"></div>
+</div>
+</section>
+
+<section id="calls" class="hide">
+<h2>Voice & Video Calls</h2>
+<div class="card">
+<input id="contact" placeholder="Contact name or number">
+<button onclick="call('audio')">Start Voice Call</button>
+<button onclick="call('video')">Start Video Call</button>
+<p class="notice">This tests local camera and microphone access. A real two-person call requires WebRTC signaling and backend services.</p>
+</div>
+</section>
+
+<section id="ai" class="hide">
+<h2>AI Voice Translation</h2>
+<div class="card">
+<h3>Manual Language Selection</h3>
+<label>Speaker Language</label>
+<select id="source"></select>
+<label>Listening Language</label>
+<select id="target"></select>
+<p>Automatic language detection: OFF</p>
+<button onclick="testASR()">Test ASR</button>
+<p id="asrOutput"></p>
+<p class="notice">The final architecture requires streaming ASR, translation and voice-preserving speech generation. Calls must contain audio only, without subtitles.</p>
+</div>
+</section>
+
+<section id="wallet" class="hide">
+<h2>Credits & Recharge</h2>
+<div class="card">
+<h2>Balance: 0 Credits</h2>
+<button onclick="integrationNotice()">Recharge Credits</button>
+<h3>Identity Verification</h3>
+<button onclick="integrationNotice()">Start KYC</button>
+<p class="notice">Payments and KYC require secure providers. No Aadhaar or biometric data is collected in this preview.</p>
+</div>
+</section>
+
+<section id="admin" class="hide">
+<h2>Admin Dashboard</h2>
+<div class="card">
+<h3>Platform Overview</h3>
+<p>Users: Local preview only</p>
+<p>Transactions: Not connected</p>
+<p>AI usage: Not connected</p>
+<p>Reports: Backend required</p>
+<p class="notice">A real admin panel must have server-enforced access controls.</p>
+</div>
+</section>
+
+<section id="settings" class="hide">
+<h2>Settings</h2>
+<div class="card">
+<input id="profileName" placeholder="Display name">
+<button onclick="saveProfile()">Save Profile</button>
+<button onclick="show('admin')">Admin UI Preview</button>
+<button onclick="logout()">Logout</button>
+</div>
+</section>
+
+</main>
+<nav>
+<button onclick="show('chats')">💬<div>Chats</div></button>
+<button onclick="show('updates')">◉<div>Updates</div></button>
+<button onclick="show('communities')">♧<div>Groups</div></button>
+<button onclick="show('calls')">☎<div>Calls</div></button>
+<button onclick="show('ai')">✦<div>AI</div></button>
+<button onclick="show('wallet')">◈<div>Wallet</div></button>
+<button onclick="show('settings')">⚙<div>Settings</div></button>
+</nav>
+</div>
+
+<div id="callOverlay" class="hide">
+<h1 id="callName">Call</h1>
+<h2 id="callStatus">Connecting local media...</h2>
+<video id="camera" autoplay playsinline muted></video>
+<p>No remote participant connected.</p>
+<button onclick="muteCall()">Mute / Unmute</button>
+<button onclick="endCall()">End Call</button>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const languages=[
+"Assamese","Bengali","Bodo","Dogri","Gujarati",
+"Hindi","Kannada","Kashmiri","Konkani","Maithili",
+"Malayalam","Manipuri","Marathi","Nepali","Odia",
+"Punjabi","Sanskrit","Santali","Sindhi","Tamil",
+"Telugu","Urdu"
+];
+const codes={
+Telugu:"te-IN",Hindi:"hi-IN",Kannada:"kn-IN",
+Tamil:"ta-IN",Malayalam:"ml-IN",Bengali:"bn-IN",
+Marathi:"mr-IN",Gujarati:"gu-IN",Punjabi:"pa-IN"
+};
+let data=JSON.parse(localStorage.getItem("pentecall-ui")||'{"chats":{},"groups":[],"statuses":[]}');
+let activeChat="",media=null,muted=false;
+let soundContext;
+function save(){localStorage.setItem("pentecall-ui",JSON.stringify(data))}
+function tapSound(){
+try{
+soundContext=soundContext||new(window.AudioContext||window.webkitAudioContext)();
+let oscillator=soundContext.createOscillator();
+let gain=soundContext.createGain();
+oscillator.frequency.value=620;
+gain.gain.value=.02;
+oscillator.connect(gain);
+gain.connect(soundContext.destination);
+oscillator.start();
+oscillator.stop(soundContext.currentTime+.045);
+}catch(e){}
+}
+document.addEventListener("click",e=>{
+if(e.target.closest("button"))tapSound();
+});
+function authNotice(){
+alert("Real OTP and Google sign-in require secure authentication integration.");
+}
+function integrationNotice(){
+alert("Secure backend and verified provider integration required.");
+}
+function enterApp(){
+$("login").classList.add("hide");
+$("app").classList.remove("hide");
+show("chats");
+}
+function show(id){
+document.querySelectorAll("main section").forEach(el=>el.classList.add("hide"));
+$(id).classList.remove("hide");
+render();
+}
+function newChat(){
+let name=prompt("Contact name or phone number");
+if(!name||!name.trim())return;
+activeChat=name.trim();
+if(!data.chats[activeChat])data.chats[activeChat]=[];
+save();render();openChat(activeChat);
+}
+function render(){
+$("chatList").replaceChildren();
+Object.keys(data.chats).forEach(name=>{
+let div=document.createElement("div");
+div.className="item";
+div.textContent="💬 "+name;
+div.onclick=()=>openChat(name);
+$("chatList").append(div);
+});
+$("statuses").replaceChildren();
+data.statuses.forEach(s=>{
+let div=document.createElement("div");
+div.className="item";div.textContent=s;
+$("statuses").append(div);
+});
+$("groups").replaceChildren();
+data.groups.forEach(g=>{
+let div=document.createElement("div");
+div.className="item";div.textContent="♧ "+g;
+$("groups").append(div);
+});
+}
+function openChat(name){
+activeChat=name;
+$("conversation").classList.remove("hide");
+$("chatTitle").textContent=name;
+$("messages").replaceChildren();
+(data.chats[name]||[]).forEach(text=>{
+let div=document.createElement("div");
+div.className="bubble";div.textContent=text;
+$("messages").append(div);
+});
+}
+function sendMessage(){
+let text=$("message").value.trim();
+if(!text||!activeChat)return;
+data.chats[activeChat].push(text);
+$("message").value="";
+save();openChat(activeChat);
+}
+function postStatus(){
+let text=$("statusText").value.trim();
+if(!text)return;
+data.statuses.unshift(text);
+$("statusText").value="";
+save();render();
+}
+function createGroup(){
+let text=$("groupName").value.trim();
+if(!text)return;
+data.groups.push(text);
+$("groupName").value="";
+save();render();
+}
+async function call(type){
+let name=activeChat||$("contact").value.trim()||"Local Test";
+$("callName").textContent=name;
+$("callOverlay").classList.remove("hide");
+$("callStatus").textContent="Requesting media permission";
+try{
+media=await navigator.mediaDevices.getUserMedia({
+audio:true,video:type==="video"
+});
+$("camera").srcObject=media;
+$("camera").style.display=type==="video"?"block":"none";
+$("callStatus").textContent="Local "+type+" test active";
+}catch(e){
+$("callStatus").textContent="Media unavailable: "+e.message;
+}
+}
+function muteCall(){
+if(!media)return;
+muted=!muted;
+media.getAudioTracks().forEach(t=>t.enabled=!muted);
+$("callStatus").textContent=muted?"Microphone muted":"Microphone active";
+}
+function endCall(){
+if(media){media.getTracks().forEach(t=>t.stop());media=null;}
+$("camera").srcObject=null;
+$("callOverlay").classList.add("hide");
+}
+function testASR(){
+let Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(!Recognition){
+$("asrOutput").textContent="ASR not supported in this browser.";
+return;
+}
+let r=new Recognition();
+r.lang=codes[$("source").value]||"en-IN";
+$("asrOutput").textContent="Listening...";
+r.onresult=e=>{
+$("asrOutput").textContent="Recognized: "+e.results[0][0].transcript;
+};
+r.onerror=e=>{
+$("asrOutput").textContent="ASR error: "+e.error;
+};
+r.start();
+}
+function saveProfile(){
+localStorage.setItem("pentecall-name",$("profileName").value);
+alert("Profile saved locally");
+}
+function logout(){
+endCall();
+$("app").classList.add("hide");
+$("login").classList.remove("hide");
+}
+["source","target"].forEach(id=>{
+languages.forEach(lang=>{
+let option=document.createElement("option");
+option.textContent=lang;
+$(id).append(option);
+});
+});
+$("source").value="Telugu";
+$("target").value="Hindi";
+$("profileName").value=localStorage.getItem("pentecall-name")||"";
+</script>
+</body>
 </html>
